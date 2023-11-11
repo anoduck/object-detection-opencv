@@ -22,48 +22,34 @@ args = ap.parse_args()
 
 
 def get_output_layers(net):
-    
     layer_names = net.getLayerNames()
     try:
         output_layers = [layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
     except:
         output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-
     return output_layers
 
 
 def draw_prediction(img, class_id, confidence, x, y, x_plus_w, y_plus_h):
-
     label = str(classes[class_id])
-
     color = COLORS[class_id]
-
     cv2.rectangle(img, (x,y), (x_plus_w,y_plus_h), color, 2)
-
     cv2.putText(img, label, (x-10,y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-    
+
 image = cv2.imread(args.image)
 
 Width = image.shape[1]
 Height = image.shape[0]
 scale = 0.00392
-
 classes = None
-
 with open(args.classes, 'r') as f:
     classes = [line.strip() for line in f.readlines()]
-
 COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
-
 net = cv2.dnn.readNet(args.weights, args.config)
-
 blob = cv2.dnn.blobFromImage(image, scale, (416,416), (0,0,0), True, crop=False)
-
 net.setInput(blob)
-
 outs = net.forward(get_output_layers(net))
-
 class_ids = []
 confidences = []
 boxes = []
@@ -96,7 +82,6 @@ for i in indices:
     except:
         i = i[0]
         box = boxes[i]
-    
     x = box[0]
     y = box[1]
     w = box[2]
@@ -105,6 +90,5 @@ for i in indices:
 
 cv2.imshow("object detection", image)
 cv2.waitKey()
-    
 cv2.imwrite("object-detection.jpg", image)
 cv2.destroyAllWindows()
